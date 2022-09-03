@@ -2,17 +2,18 @@ var environment = {
     staging: {
         httpPort: 3000,
         httpsPort: 3001,
-        envName: 'staging'
+        envName: 'staging',
+        hashingSecret: '87482ji'
     },
     production: {
         httpPort: 5000,
         httpsPort: 5001,
-        envName: 'production'
+        envName: 'production',
+        hashingSecret: '89kj2389'
     }
 }
 
 var env = process.env.NODE_ENV || 'staging';
-console.log(process.env.NODE_ENV)
 
 var currentEnv = environment[env]
 module.exports = currentEnv

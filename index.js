@@ -5,10 +5,12 @@ var fs = require('fs');
 var config = require('./config');
 var stringDecoder = require('string_decoder').StringDecoder;
 var _data = require('./lib/data');
+var handlers = require('./lib/handler');
+var helpers = require('./lib/helpers');
 
-_data.delete('test', 'newFile',  function(err){
-    console.log('this was the error', err)
-})
+// _data.delete('test', 'newFile',  function(err){
+//     console.log('this was the error', err)
+// })
 // _data.update('test', 'newFile', {'fizz':'buzz'}, function(err){
 //     console.log('this was the error', err)
 // })
@@ -19,26 +21,13 @@ _data.delete('test', 'newFile',  function(err){
 //     console.log('this is the err', err, 'and data', data)
 // })
 // handlers
-var handlers = {};
-
-handlers.sample = function(data, callback) {
-
-    callback(406, {name:'callback'})
-};
-
-handlers.notFound = function (data, callback) {
-    callback(404)
-}
-
-handlers.ping = function (data, callback) {
-    callback(200)
-}
 
 //routers
 var router = {
     sample: handlers.sample,
     notFound: handlers.notFound,
-    ping: handlers.ping
+    ping: handlers.ping,
+    users: handlers.users
 }
 
 var httpsServerOption = {
@@ -67,15 +56,14 @@ function unifiedServer(req, res) {
     })
     req.on('end', function () {
         buffer += decoder.end();
-
         var chosenHandler = router[pathName] ? router[pathName] : router['notFound'];
         console.log('chosen path :', pathName)
         var data = {
             pathName,
             queryObject,
-            method: req.method,
+            method: req.method.toLowerCase(),
             headers,
-            payload: buffer
+            payload: helpers.parseJsonToObject(buffer)
         }
 
         chosenHandler(data, function (statusCode, payload) {
